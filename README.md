@@ -1,0 +1,1 @@
+# proxmox-oidc-credential-helper
