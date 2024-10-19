@@ -30,7 +30,10 @@ Download binary from releases page & unzip
 
 ## Usage: 
 
+
 Download binary and put somewhere in $PATH.
+
+### Shell 
 
 Run `proxmox-oidc-credentials-helper -proxmox-url https://proxmox.example.com:8006 -realm OIDC-REALM-NAME`. By default this application will output export commands to be executed to set credentials in the shell. 
 Alternatively run:
@@ -38,6 +41,38 @@ Alternatively run:
 ```shell
 eval $(proxmox-oidc-credentials-helper -proxmox-url https://proxmox.example.com:8006 -realm OIDC-REALM-NAME)
 ```
+
+### Terragrunt
+
+For automated use with Terragrunt and [bpg/proxmox terraform provider](https://registry.terraform.io/providers/bpg/proxmox/latest) add following code:
+```hcl
+terragrunt {
+  extra_arguments "proxmox_oidc_helper" {
+    commands = [
+      "apply",
+      "refresh",
+      "import",
+      "plan",
+      "taint",
+      "untaint",
+      "destroy",
+      "state",
+      "output",
+      "console",
+    ]
+    env_vars = {
+      PROXMOX_VE_AUTH_TICKET = jsondecode(local.proxmox_creds)["data"]["ticket"]
+      PROXMOX_VE_CSRF_PREVENTION_TOKEN = jsondecode(local.proxmox_creds)["data"]["CSRFPreventionToken"]
+    }
+  }
+}
+
+locals {
+  proxmox_creds = run_cmd("--terragrunt-quiet", "proxmox-oidc-credentials-helper","-proxmox-url=https://proxmox.example.com:8006","-realm=REALM_NAME", "-output=json")
+}
+
+```
+
 
 For additional configuration options please check `proxmox-oidc-credentials-helper -h`
 
