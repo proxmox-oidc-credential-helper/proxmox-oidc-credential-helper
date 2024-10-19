@@ -19,3 +19,7 @@ eval $(proxmox-oidc-credentials-helper -proxmox-url https://proxmox.example.com:
 ```
 
 For additional configuration options please check `proxmox-oidc-credentials-helper -h`
+
+# Compatibility
+
+This application should work well on all OSes, but due to limited resources it is only tested on MacOS.
