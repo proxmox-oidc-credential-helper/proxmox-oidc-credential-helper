@@ -6,4 +6,5 @@ type Config struct {
 	ProxmoxURL     string
 	TimeoutSeconds int
 	VerboseLog     bool
+	Realm          string
 }

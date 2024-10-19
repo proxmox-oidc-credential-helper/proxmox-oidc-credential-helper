@@ -4,20 +4,21 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/camaeel/proxmox-oidc-credential-helper/pkg/config"
 	"io"
 	"net/http"
 )
 
-func GetOidcURL(serverHost string) (string, error) {
+func GetOidcURL(cfg config.Config) (string, error) {
 	body, err := json.Marshal(map[string]string{
-		"redirect-url": "http://localhost:8996/oidc/callback", //TODO parametrize
-		"realm":        "auth0",                               //TODO parametrize
+		"redirect-url": fmt.Sprintf("http://localhost:%d%s", cfg.CallbackPort, cfg.CallbackPath),
+		"realm":        cfg.Realm,
 	})
 	if err != nil {
 		return "", err
 	}
 	bodyReader := bytes.NewReader(body)
-	requestURL := fmt.Sprintf("%s/api2/json/access/openid/auth-url", serverHost)
+	requestURL := fmt.Sprintf("%s/api2/json/access/openid/auth-url", cfg.ProxmoxURL)
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		return "", err

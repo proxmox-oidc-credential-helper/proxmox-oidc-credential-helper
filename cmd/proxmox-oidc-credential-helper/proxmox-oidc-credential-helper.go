@@ -18,6 +18,7 @@ func main() {
 	flag.IntVar(&cfg.CallbackPort, "callback-port", 8996, "callback port. Default is 8996")
 	flag.StringVar(&cfg.CallbackPath, "callback-path", "/oidc/callback", "callback port. Default is 8996")
 	flag.StringVar(&cfg.ProxmoxURL, "proxmox-url", "", "Url to proxmox server with protocol and port, i.e. https://proxmox.example.com:8006")
+	flag.StringVar(&cfg.Realm, "realm", "", "Proxmox OIDC realm")
 	flag.IntVar(&cfg.TimeoutSeconds, "timeout-url", 180, "Timeout in seconds for whole authentication. By default 180 seconds.")
 	flag.BoolVar(&cfg.VerboseLog, "verbose", false, "Verbose logging")
 
@@ -25,6 +26,11 @@ func main() {
 
 	if cfg.ProxmoxURL == "" {
 		slog.Error("Flag proxmox-url is required")
+		os.Exit(1)
+	}
+
+	if cfg.Realm == "" {
+		slog.Error("Flag realm is required")
 		os.Exit(1)
 	}
 
@@ -38,7 +44,7 @@ func main() {
 	cancelHttp := callback.StartHttpServer(ctx, cancel, cfg.CallbackPort, cfg.CallbackPath)
 	defer cancelHttp()
 
-	redirectUrl, err := proxmox.GetOidcURL(cfg.ProxmoxURL)
+	redirectUrl, err := proxmox.GetOidcURL(cfg)
 	if err != nil {
 		slog.Error("Unable to obtain oidc URL from proxmox server", slog.String("error", err.Error()))
 		os.Exit(1)
