@@ -1,0 +1,62 @@
+on:
+  push:
+    paths-ignore:
+      - 'charts/**'
+      - 'example/**'
+      - 'docs/**'
+      - '/*.md'
+      - 'tests.rest'
+    branches:
+      - '*'
+  pull_request:
+    paths-ignore:
+      - 'example/**'
+      - 'charts/**'
+      - 'docs/**'
+      - '/*.md'
+      - 'tests.rest'
+  workflow_call:
+
+name: Build and test
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+  trivy-scan:
+    uses: ./.github/workflows/trivy.yml
+  test-and-release-snapshot:
+    needs:
+      - trivy-scan
+      - test
+    permissions:
+      contents: read
+      packages: write
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+        id: go
+
+      - name: Set SNAPSHOT_VERSION if not pull request
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "SNAPSHOT_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        id: gorleaser
+        with:
+          version: "~> v2"
+          distribution: goreleaser
+          args: release --clean --snapshot
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

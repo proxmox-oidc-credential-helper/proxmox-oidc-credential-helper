@@ -1,0 +1,43 @@
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+name: Build, test and release
+jobs:
+  trivy-scan:
+    uses: ./.github/workflows/trivy.yml
+  test:
+    uses: ./.github/workflows/test.yml
+  release:
+    needs:
+      - trivy-scan
+      - test
+    permissions:
+      contents: write
+      packages: write
+    runs-on: ubuntu-latest
+    outputs:
+      docker_images: ${{ steps.docker_images.outputs.docker_images }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: './go.mod'
+          cache: true
+        id: go
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          version: "~> v2"
+          distribution: goreleaser
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
