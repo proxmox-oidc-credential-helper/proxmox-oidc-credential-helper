@@ -7,4 +7,5 @@ type Config struct {
 	TimeoutSeconds int
 	VerboseLog     bool
 	Realm          string
+	OutputFormat   string
 }

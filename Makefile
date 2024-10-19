@@ -13,3 +13,6 @@ lint:
 
 vet:
 	$(gocmd)  vet ./...
+
+trivy:
+	trivy fs .

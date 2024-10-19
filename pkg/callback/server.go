@@ -2,7 +2,6 @@ package callback
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -10,7 +9,7 @@ import (
 	"net/url"
 )
 
-func oidcCallbackHandlerFactory(cancelFunc context.CancelFunc) func(w http.ResponseWriter, r *http.Request) {
+func oidcCallbackHandlerFactory(cancelFunc context.CancelFunc, result chan CallbackResult) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		slog.Debug("got request", slog.String("url", r.URL.String()), slog.String("method", r.Method))
 		parsedUrl, err := url.Parse(r.RequestURI)
@@ -35,40 +34,46 @@ func oidcCallbackHandlerFactory(cancelFunc context.CancelFunc) func(w http.Respo
 			cancelFunc()
 			return
 		}
-		code := params["code"][0]
+		//code := params["code"][0]
+		//
+		//state := params["state"][0]
 
-		state := params["state"][0]
-
-		stateStruct := make(map[string]interface{})
-		err = json.Unmarshal([]byte(state), &stateStruct)
-		if err != nil {
-			slog.Error("error unmarshaling json from request parameters", slog.String("error", err.Error()))
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			cancelFunc()
-			return
-		}
-		csrfToken := stateStruct["csrf_token"]
-		fmt.Printf("export CODE=%s\n", code)
-		fmt.Printf("export CSRF_TOKEN=%s\n", csrfToken)
-
+		//stateStruct := make(map[string]interface{})
+		//err = json.Unmarshal([]byte(state), &stateStruct)
+		//if err != nil {
+		//	slog.Error("error unmarshaling json from request parameters", slog.String("error", err.Error()))
+		//	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		//	cancelFunc()
+		//	return
+		//}
+		//csrfToken := stateStruct["csrf_token"]
+		//fmt.Printf("export PROXMOX_VE_AUTH_TICKET=%s\n", code)
+		//fmt.Printf("export PROXMOX_VE_CSRF_PREVENTION_TOKEN=%s\n", csrfToken)
+		//
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		_, err = w.Write([]byte("<html><script type=\"text/javascript\">window.close()</script></html>"))
 		if err != nil {
 			slog.Error("writing response", slog.String("error", err.Error()))
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			cancelFunc()
 		}
-		cancelFunc()
+		resultData := CallbackResult{
+			Code:  params["code"][0],
+			State: params["state"][0],
+		}
+		result <- resultData
+
 	}
 }
 
-func StartHttpServer(ctx context.Context, cancel context.CancelFunc, port int, callbackPath string) func() {
+func StartHttpServer(cancel context.CancelFunc, port int, callbackPath string, result chan CallbackResult) func() {
 	srv := &http.Server{
 		Addr: fmt.Sprintf(":%d", port),
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc(callbackPath, oidcCallbackHandlerFactory(cancel))
+	mux.HandleFunc(callbackPath, oidcCallbackHandlerFactory(cancel, result))
 	srv.Handler = mux
 
 	go func() {
