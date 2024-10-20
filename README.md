@@ -35,11 +35,11 @@ Download binary and put somewhere in $PATH.
 
 ### Shell 
 
-Run `proxmox-oidc-credentials-helper -proxmox-url https://proxmox.example.com:8006 -realm OIDC-REALM-NAME`. By default this application will output export commands to be executed to set credentials in the shell. 
+Run `proxmox-oidc-credential-helper -proxmox-url https://proxmox.example.com:8006 -realm OIDC-REALM-NAME`. By default this application will output export commands to be executed to set credentials in the shell. 
 Alternatively run:
 
 ```shell
-eval $(proxmox-oidc-credentials-helper -proxmox-url https://proxmox.example.com:8006 -realm OIDC-REALM-NAME)
+eval $(proxmox-oidc-credential-helper -proxmox-url https://proxmox.example.com:8006 -realm OIDC-REALM-NAME)
 ```
 
 ### Terragrunt
@@ -68,13 +68,13 @@ terragrunt {
 }
 
 locals {
-  proxmox_creds = run_cmd("--terragrunt-quiet", "proxmox-oidc-credentials-helper","-proxmox-url=https://proxmox.example.com:8006","-realm=REALM_NAME", "-output=json")
+  proxmox_creds = run_cmd("--terragrunt-quiet", "proxmox-oidc-credential-helper","-proxmox-url=https://proxmox.example.com:8006","-realm=REALM_NAME", "-output=json")
 }
 
 ```
 
 
-For additional configuration options please check `proxmox-oidc-credentials-helper -h`
+For additional configuration options please check `proxmox-oidc-credential-helper -h`
 
 # Compatibility
 
