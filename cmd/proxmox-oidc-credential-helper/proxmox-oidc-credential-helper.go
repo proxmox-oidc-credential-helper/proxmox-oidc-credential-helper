@@ -23,6 +23,7 @@ func main() {
 	flag.IntVar(&cfg.TimeoutSeconds, "timeout-url", 180, "Timeout in seconds for whole authentication. By default 180 seconds.")
 	flag.BoolVar(&cfg.VerboseLog, "verbose", false, "Verbose logging")
 	flag.StringVar(&cfg.OutputFormat, "output", "text", "Output format. One of: text|json. Default is text")
+	flag.BoolVar(&cfg.OpenDefaultBrowser, "open-browser", true, "Open default browser. Default is true. Might be useful in situations where default browser is not working well.")
 
 	flag.Parse()
 
@@ -63,10 +64,14 @@ func main() {
 		slog.Error("Unable to obtain oidc URL from proxmox server", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
-	err = browser.OpenURL(redirectUrl)
-	if err != nil {
-		slog.Error("Unable to open browser", slog.String("error", err.Error()))
-		os.Exit(1)
+	if cfg.OpenDefaultBrowser {
+		err = browser.OpenURL(redirectUrl)
+		if err != nil {
+			slog.Error("Unable to open browser", slog.String("error", err.Error()))
+			os.Exit(1)
+		}
+	} else {
+		browser.OutputOpenURL(redirectUrl)
 	}
 
 	select {

@@ -1,6 +1,7 @@
 package browser
 
 import (
+	"fmt"
 	"log/slog"
 	"os/exec"
 	"runtime"
@@ -22,4 +23,8 @@ func OpenURL(url string) error {
 	}
 	args = append(args, url)
 	return exec.Command(cmd, args...).Start()
+}
+
+func OutputOpenURL(url string) {
+	fmt.Printf("# Open this URL in the browser: %s\n", url)
 }
