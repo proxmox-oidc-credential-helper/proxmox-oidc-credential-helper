@@ -71,7 +71,11 @@ func main() {
 			os.Exit(1)
 		}
 	} else {
-		fmt.Println(browser.PrintableOpenURL(redirectUrl))
+		_, err = fmt.Fprintln(os.Stderr, browser.PrintableOpenURL(redirectUrl))
+		if err != nil {
+			slog.Error("Unable to open print link", slog.String("error", err.Error()))
+			os.Exit(1)
+		}
 	}
 
 	select {
