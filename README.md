@@ -13,9 +13,9 @@ if [[ $architecture == "x86_64" ]]; then
 elif [[ $architecture == "aarch64" ]]; then 
   architecture=arm64;
 fi
-VERSION=0.1.0
+LATEST_VERSION=` curl -s https://api.github.com/repos/camaeel/proxmox-oidc-credential-helper/releases/latest | jq -r '.tag_name'`
 
-wget "https://github.com/camaeel/proxmox-oidc-credential-helper/releases/download/v${VERSION}/proxmox-oidc-credential-helper_`uname -o`_${architecture}.tar.gz" -O proxmox-oidc-credential-helper.tar.gz
+wget "https://github.com/camaeel/proxmox-oidc-credential-helper/releases/download/${LATEST_VERSION}/proxmox-oidc-credential-helper_`uname -o`_${architecture}.tar.gz" -O proxmox-oidc-credential-helper.tar.gz
 tar -xzvf proxmox-oidc-credential-helper.tar.gz
 ```
 
