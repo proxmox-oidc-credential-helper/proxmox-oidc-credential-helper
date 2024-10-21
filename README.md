@@ -73,6 +73,11 @@ locals {
 
 ```
 
+### Proxmoxer
+
+[Proxmoxer](https://proxmoxer.github.io/docs/latest/) can utilize proxmox-oidc-credential-helper to obtain credentials from OIDC using web browser.
+Example script can be found in this repo in [this example](examples/proxmoxer/proxmoxer_example.py)
+
 
 For additional configuration options please check `proxmox-oidc-credential-helper -h`
 
