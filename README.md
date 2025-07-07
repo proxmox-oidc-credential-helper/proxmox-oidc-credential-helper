@@ -30,7 +30,6 @@ Download binary from releases page & unzip
 
 ## Usage: 
 
-
 Download binary and put somewhere in $PATH.
 
 ### Shell 
@@ -70,7 +69,6 @@ terragrunt {
 locals {
   proxmox_creds = run_cmd("--terragrunt-quiet", "proxmox-oidc-credential-helper","-proxmox-url=https://proxmox.example.com:8006","-realm=REALM_NAME", "-output=json")
 }
-
 ```
 
 ### Proxmoxer
