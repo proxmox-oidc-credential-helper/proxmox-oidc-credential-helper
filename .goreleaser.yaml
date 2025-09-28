@@ -122,7 +122,7 @@ homebrew_casks:
       template: "https://github.com/proxmox-oidc-credential-helper/proxmox-oidc-credential-helper/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
       verified: "github.com/proxmox-oidc-credential-helper/proxmox-oidc-credential-helper/"
 
-      using: ":homebrew_curl"
+      #using: ":homebrew_curl"
 
     commit_msg_template: "Brew cask update for {{ .ProjectName }} version {{ .Tag }}"
 
@@ -254,3 +254,10 @@ homebrew_casks:
         # Valid options: openpgp, x509, ssh.
         # Default: openpgp.
         format: openpgp
+    hooks:
+      post:
+        # replace foo with the actual binary name
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/proxmox-oidc-credential-helper"]
+          end
