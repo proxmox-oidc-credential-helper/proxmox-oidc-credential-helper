@@ -4,7 +4,13 @@ This small utility allows to obtain credentials from Proxmox's UI using OIDC and
 
 ## Instalation
 
-### MacOS / Linux
+### With Homebrew
+```shell
+brew tap proxmox-oidc-credential-helper/tap
+brew install proxmox-oidc-credential-helper --cask
+```
+
+### MacOS / Linux - download with curl
 
 ```shell
 architecture=`uname -m`
@@ -21,7 +27,7 @@ tar -xzvf proxmox-oidc-credential-helper.tar.gz
 
 ### Windows
 
-Download binary from releases page & unzip
+Download binary from releases page & unzip or use Homebrew
 
 ## Prerequisites
 
