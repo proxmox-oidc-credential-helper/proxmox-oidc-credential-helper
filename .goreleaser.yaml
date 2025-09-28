@@ -181,8 +181,8 @@ homebrew_casks:
         # this.
         #
         # Since: v2.12
-        body: |
-          cc/ @camaeel
+        #body: |
+        #  cc/ @camaeel
 
 
       # Clone, create the file, commit and push, to a regular Git repository.
